@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class Board {
@@ -41,9 +42,32 @@ public class Board {
 		}
 	}
 	
+	
+	
 	public void makeMove(Action action) {
-		PriorityQueue<Action> pQueue = new PriorityQueue<Action>();
-		//IMplement Comparator prot class to sort by Action.val
+		for(String move:action.moves) {
+			if(move!= null) makeSingleMove(move);
+		}
+	}
+	
+	public void makeSingleMove(String move) { //takes in example 'D1-C2'
+		int j1 = Integer.parseInt(move.substring(1,2))-1;
+		int j2 = Integer.parseInt(move.substring(4,5))-1;
+		int i1 = getRow(move.charAt(0));
+		int i2 = getRow(move.charAt(3));
+		
+		
+		
+		if(Math.abs(j2-j1) > 1) {
+			int jCaptured = (j1+j2)/2;
+			int iCaptured = (i1+i2)/2;
+			this.set_up[iCaptured][jCaptured] = ' ';
+			this.set_up[i2][j2] = this.set_up[i1][j1];
+		}
+		else {
+			this.set_up[i2][j2] = this.set_up[i1][j1];
+		}
+		this.set_up[i1][j1] = ' ';
 	}
 	
 	public String getSquareStr(int i, int j) { //returns the string identifier for a certain index
@@ -95,8 +119,7 @@ public class Board {
 		int y = Integer.parseInt(""+pos.charAt(1));
 		int l = this.size;
 		int i = l-1-x;
-		int j = l-1-y;
-		System.out.println("fipped"+ x + " " + y + " to " + i + " " + j);
+		int j = l-y;
 		flipped = getSquareStr(i,j);
 		return flipped;
 	}
@@ -132,11 +155,77 @@ public class Board {
 		return row;
 	}
 	
+	public ArrayList<String> flipMove(ArrayList<String> moves){
+		ArrayList<String> newM = new ArrayList<String>();
+		if(moves == null) return null;
+		else for(String str: moves) {
+			String _1 = str.substring(0, 2);
+			String _2 = str.substring(3, 5);
+			_1 = flipPos(_1);
+			
+			_2 = flipPos(_2);
+			str = _1 + "-" + _2;
+			newM.add(str);
+		}
+		return newM;
+	}
+	
+//	if(actions == null) return null;
+//	else for(Action act: actions) {
+//		if(act.moves == null) return null;
+//		else for(String move: act.moves) {
+//			act.moves.remove(move);
+//			move = flipPos(move);
+//			act.moves.add(move);
+//		}
+//	}
+	
+	public Action flipAction(Action act){
+		ArrayList<String> moves = new ArrayList<String>();
+		if(act != null) act.moves = flipMove(act.moves);
+		return act;
+	}
+	
+	public ArrayList<Action> flipActions(ArrayList<Action> actions){
+		ArrayList<Action> nA = new ArrayList<Action>();
+		if(actions == null) return null;
+		else for(Action act: actions){
+			act = flipAction(act);
+			nA.add(act);
+		}
+		return nA;
+	}
+	
+	public ArrayList<String> positions(char player){ //Returns all positions occupied by player
+		ArrayList<String> positions = new ArrayList<String>();
+		for(int i=0; i<this.size; i++)
+			for(int j=0; j<this.size; j++)
+				if(this.set_up[i][j] == player) positions.add(getSquareStr(i,j));
+		return positions;
+	}
+	
+	
 	public static void main(String[] args) {
-		Board b = new Board(2);
-		System.out.println(b.getSquareStr(7, 7));
+		Board b = new Board(1);
+//		System.out.println(b.getSquareStr(7, 7));
 		//b.print();
-
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("A4-C2");
+		list.add("D1-B3");
+		list.add("D1-B3");
+		Action act = new Action();
+		act.moves = list;
+		ArrayList<Action> actions = new ArrayList<Action>();
+		actions.add(act);
+		System.out.println("BEFORE: " + actions.get(0).moves.toString());
+		b.flipActions(actions);
+		System.out.println("AFTER: " + actions.get(0).moves.toString());
+		
+		String x = "D1-B3";
+		b.set_up[2][1] = 'b';
+		b.print();
+		b.makeSingleMove(x);
+		b.print();
 	}
 
 }

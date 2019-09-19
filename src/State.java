@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class State {
 	
 	char player;
+	char opponent;
 	Board board;
 	int utility; //heuristic for non terminal state
 	Boolean terminal;
@@ -11,8 +12,11 @@ public class State {
 	ArrayList<Action> actions; // Set of possible actions in this state
 	
 	public State(char player, Board board) {
+		if(player == 'w') this.opponent = 'b';
+		else this.opponent = 'w';
 		this.player = player;
 		this.board = board;
+		this.actions = new ArrayList<Action>();
 	}
 	
 	public int getUtility() {
@@ -33,92 +37,331 @@ public class State {
 					String poss = this.board.getSquareStr(i, j);
 					Boolean isKing = false;
 					if(squareVal == 'W' || squareVal == 'B') isKing = true;
-					moves = getPossActions(poss, isKing);
+					ArrayList<String> myArr = this.board.positions(this.player);
+					ArrayList<String> oppoArr = this.board.positions(this.opponent);
+					moves = getPossActions(poss, isKing, myArr, oppoArr);
+					for(Action act: moves)
+						if(act.moves != null)
+							actions.add(act);
 					
-					if(moves != null) actions.addAll(moves);
-					if(this.player == 'b' && moves != null) {
-						for(Action act: moves)
-							if(act != null)
-								for(String move: act.moves) {
-									act.moves.add(this.board.flipPos(move));
-									act.moves.remove(move);
-								}
-					}
+//					if(this.player == 'b' && moves != null) {
+//						for(Action act: moves)
+//							if(act != null)
+//								for(String move: act.moves) {
+//									act.moves.add(this.board.flipPos(move));
+//									act.moves.remove(move);
+//								}
+//					}
 					
 				}
 				else continue;
 			}
 		}
-		this.board.print();
-		this.board.flipArr();
+		//if black player, flip all moves in actions list and flip board back
+		if(this.player == 'b') {
+			this.board.flipArr();
+			this.board.flipActions(this.actions);
+		}
+		
 		return this.actions;
 	}
 	
-	public ArrayList<Action> getPossActions(String poss, Boolean isKing) { //get all possible moves for a piece
-		ArrayList<String> possDiags = possDiagonals(poss, isKing); 
-		System.out.printf("Piece at %s and %b:\n",poss,isKing);
-		for(String diag: possDiags) {
-			System.out.println(this.board.flipPos(diag));
+	public ArrayList<Action> getPossActions(String poss, Boolean isKing, ArrayList<String> myArr, ArrayList<String> oppoArr) { //get all possible moves for a piece
+		
+		ArrayList<Action> possMoves = possMoves(poss, isKing,myArr,oppoArr); 
+		for(Action act: possMoves) {
+			//System.out.println(act.moves.toString());
 		}
-		System.out.println();
-		ArrayList<Action> possMoves = null;
+		//ArrayList<Action> possMoves = null;
 		return possMoves;
 	}
 	
-	public static ArrayList<String> possDiagonals(String currPos, boolean isKing) { //arraylist of strings
-		ArrayList<String> possDiagonals= new ArrayList<String>();
+//	public static ArrayList<String> possMoves(String currPos, boolean isKing) { //arraylist of strings
+//		ArrayList<String> possMoves= new ArrayList<String>();
+//		int column;
+//		char row;
+//		
+//		//separate A1 to A & 1
+//				row = currPos.charAt(0);
+//				char ab = (char)currPos.charAt(1);
+//				column =Character.getNumericValue(ab);// Integer.toString(Character.toString ((char) currPos.charAt(1)));
+//		
+//		if(isKing == true) {  //checking if it's king
+//			
+//			char rBefore = (char)((int)row - 1);   //row before
+//			char rAfter = (char)((int)row + 1);   //row after
+//			
+//			int cBefore = column - 1; //column before
+//			int cAfter = column + 1; //column after
+//			
+//			//checking boundaries
+//			if(rBefore == 'A' || rBefore == 'B' || rBefore == 'C' || rBefore == 'D') {
+//				if( cBefore > 0 && cBefore < 5 ) {
+//					possMoves.add(Character.toString(rBefore) + Integer.toString(cBefore));
+//				}
+//				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
+//					possMoves.add(Character.toString(rBefore) + Integer.toString(cAfter));
+//				}
+//			}
+//			if(rAfter == 'A' || rAfter == 'B' || rAfter == 'C' || rAfter == 'D') {
+//				if( cBefore > 0 && cBefore < 5 ) {
+//					possMoves.add(Character.toString(rAfter) + Integer.toString(cBefore));
+//				}
+//				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
+//					possMoves.add(Character.toString(rAfter) + Integer.toString(cAfter));
+//				}
+//			}
+//			
+//		}else { //not king - can only move forward
+//
+//			char rBefore = (char)((int)row - 1);
+//			
+//			int cBefore = column - 1; //column before
+//			int cAfter = column + 1;  //column after
+//			
+//			if(rBefore == 'A' || rBefore == 'B' || rBefore == 'C' || rBefore == 'D') {
+//				if( cBefore > 0 && cBefore < 5 ) {
+//					possMoves.add(Character.toString(rBefore) + Integer.toString(cBefore));
+//				}
+//				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
+//					possMoves.add(Character.toString(rBefore) + Integer.toString(cAfter));
+//				}
+//			}
+//		}
+//		return possMoves;
+//	}
+	
+	
+	
+	
+	
+	
+	
+	public static ArrayList<Action> possMoves(String currPos, boolean isKing, ArrayList<String> myArr, ArrayList<String> oppoArr) { //arraylist of strings
+		//closest four diagonals
+		ArrayList<String> possibleDiag= new ArrayList<String>();
+		//final out of ArrayList of Actions
+		ArrayList<Action> actionList = new ArrayList<Action>();
+		
 		int column;
 		char row;
 		
 		//separate A1 to A & 1
-				row = currPos.charAt(0);
-				char ab = (char)currPos.charAt(1);
-				column =Character.getNumericValue(ab);// Integer.toString(Character.toString ((char) currPos.charAt(1)));
+		row = currPos.charAt(0);
+		column = Character.getNumericValue((char)currPos.charAt(1));
 		
-		if(isKing == true) {  //checking if it's king
-			
-			char rBefore = (char)((int)row - 1);   //row before
-			char rAfter = (char)((int)row + 1);   //row after
-			
-			int cBefore = column - 1; //column before
-			int cAfter = column + 1; //column after
-			
-			//checking boundaries
-			if(rBefore == 'A' || rBefore == 'B' || rBefore == 'C' || rBefore == 'D') {
-				if( cBefore > 0 && cBefore < 5 ) {
-					possDiagonals.add(Character.toString(rBefore) + Integer.toString(cBefore));
+		//do {
+		
+			if(isKing == true) {  //checking if it's king
+				
+				char rBefore = (char)((int)row - 1);   //row before
+				char rAfter = (char)((int)row + 1);   //row after
+				
+				int cBefore = column - 1; //column before
+				int cAfter = column + 1; //column after
+				
+				//checking boundaries v2
+				if(checkBound(rBefore,cBefore)) {
+					possibleDiag.add(currPos + "-" + Character.toString(rBefore) + Integer.toString(cBefore));
 				}
-				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
-					possDiagonals.add(Character.toString(rBefore) + Integer.toString(cAfter));
+				if(checkBound(rBefore,cAfter)) {
+					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cAfter));
+				}
+				if(checkBound(rAfter,cBefore)) {
+					possibleDiag.add(currPos + "-" +Character.toString(rAfter) + Integer.toString(cBefore));
+				}
+				if(checkBound(rAfter,cAfter)) {
+					possibleDiag.add(currPos + "-" +Character.toString(rAfter) + Integer.toString(cAfter));
+				}
+				
+				
+			}else { //not king - can only move forward
+	
+				char rBefore = (char)((int)row - 1);
+				
+				int cBefore = column - 1; //column before
+				int cAfter = column + 1;  //column after
+				
+				//checking boundaries v2
+				if(checkBound(rBefore,cBefore)) {
+					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cBefore));
+				}
+				if(checkBound(rBefore,cAfter)) {
+					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cAfter));
+				}
+							
+			}
+			
+			//for each diagonal position
+			for (String diag : possibleDiag) {
+				char diagRow; //= diag.charAt(0);
+				int diagCol; //= Character.getNumericValue((char)currPos.charAt(1));
+				
+	
+				//check if there are my pieces
+				if( myArr.contains(diag) ) {
+					//do not add to the actionList
+				}else if ( oppoArr.contains(diag) ) {
+					//jump over opponent
+					//check empty position over the opponent and boundary
+					
+					boolean canMove = false;
+					ArrayList<String> jumpList = new ArrayList<String>();
+					int capture = 0;
+					
+					//update diag each time jumping
+					diagRow = diag.charAt(0);
+					diagCol = Character.getNumericValue((char)diag.charAt(1));
+					
+					if(isKing) {
+						//for king - all directions
+						if(diagRow == (char)((int)row - 1) && diagCol == column - 1 ) { //front left diag
+							//empty position
+							char emptyRow = (char) ((int)diagRow - 1);
+							int emptyCol = diagCol - 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then capture
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+	//							canMove = true;
+	//							jumpList.add(emptyPos);
+	//							capture++;
+	//							row = emptyRow; //update to empty position
+	//							column = emptyCol;
+								//continue;
+							}else {
+								canMove = false;
+								
+							}
+						}else if(diagRow == (char)((int)row - 1) && diagCol == column + 1 ) { //front right diag
+							
+							//empty position
+							char emptyRow = (char) ((int)diagRow - 1);
+							int emptyCol = diagCol + 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then add to output arr
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								canMove = true;
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+								
+							}else {
+								canMove = false;
+							}
+						}else if(diagRow == (char)((int)row + 1) && diagCol == column - 1 ) { //back left diag
+							//empty position
+							char emptyRow = (char) ((int)diagRow + 1);
+							int emptyCol = diagCol - 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then add to output arr
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								canMove = true;
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+								
+							}else {
+								canMove = false;
+							}
+						}else if(diagRow == (char)((int)row + 1) && diagCol == column + 1 ) { //back right diag
+							//empty position
+							char emptyRow = (char) ((int)diagRow + 1);
+							int emptyCol = diagCol + 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then add to output arr
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								canMove = true;
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+								
+								
+							}else {
+								canMove = false;
+							}
+						}
+					}else {
+						//non-king pieces
+						if(diagRow == (char)((int)row - 1) && diagCol == column - 1 ) { //front left diag
+							//empty position
+							char emptyRow = (char) ((int)diagRow - 1);
+							int emptyCol = diagCol - 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then capture
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+	//							canMove = true;
+	//							jumpList.add(emptyPos);
+	//							capture++;
+	//							row = emptyRow; //update to empty position
+	//							column = emptyCol;
+								//continue;
+							}else {
+								canMove = false;
+								
+							}
+						}else if(diagRow == (char)((int)row - 1) && diagCol == column + 1 ) { //front right diag
+							
+							//empty position
+							char emptyRow = (char) ((int)diagRow - 1);
+							int emptyCol = diagCol + 1;
+							String emptyPos = Character.toString(emptyRow) + Integer.toString(emptyCol);
+							
+							//if it is within boundary and not in oppoArr and myArr then add to output arr
+							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
+								canMove = true;
+								jumpList.add(emptyPos);
+								actionList.add(new Action(1,jumpList));
+								
+							}else {
+								canMove = false;
+							}
+						}
+					}
+					
+//					if(jumpList.isEmpty()) {
+//						//dont add actionList
+//					}else {
+//						//add to actionList
+//						actionList.add(new Action(capture, jumpList)); //add new action with jump # and jumpList
+//					}
+	
+					
+				}else {
+					//empty position add to actionList with int val = 0
+					ArrayList<String> arr = new ArrayList<String>();
+					arr.add(diag);
+					actionList.add( new Action(0, arr) );
+					//arr.removeAll(arr);
 				}
 			}
-			if(rAfter == 'A' || rAfter == 'B' || rAfter == 'C' || rAfter == 'D') {
-				if( cBefore > 0 && cBefore < 5 ) {
-					possDiagonals.add(Character.toString(rAfter) + Integer.toString(cBefore));
-				}
-				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
-					possDiagonals.add(Character.toString(rAfter) + Integer.toString(cAfter));
-				}
-			}
 			
-		}else { //not king - can only move forward
-
-			char rBefore = (char)((int)row - 1);
+		//}while(canMove);
 			
-			int cBefore = column - 1; //column before
-			int cAfter = column + 1;  //column after
-			
-			if(rBefore == 'A' || rBefore == 'B' || rBefore == 'C' || rBefore == 'D') {
-				if( cBefore > 0 && cBefore < 5 ) {
-					possDiagonals.add(Character.toString(rBefore) + Integer.toString(cBefore));
-				}
-				if(cAfter == 1 || cAfter == 2 || cAfter == 3 || cAfter == 4) {
-					possDiagonals.add(Character.toString(rBefore) + Integer.toString(cAfter));
-				}
-			}
-		}
-		return possDiagonals;
+		
+		return actionList; 
 	}
+	
+	public static boolean checkBound(char row, int column) {  //A=row, 1=column
+		if(row == 'A' || row == 'B' || row == 'C' || row == 'D') {
+			if( column > 0 && column < 5 ) {
+				return true;
+			}else {
+				return false;
+			}
+			
+		}else {
+			return false;
+		}
+	}
+	
+	
+	
 	
 	
 	public static void main(String[] args) {

@@ -7,9 +7,14 @@ public class Agent {
 	//1-random, 2-minimax, 3-minimax+alpha-beta pruning, 4-H-minimax+fixed depth cutoff+alpha-beta pruning
 	int type;
 	int depthLim;
+	int depth;
 	
 	public Agent(int type) {
 		this.type = type;
+	}
+	public Agent(int type, int depth) {
+		this.type = type;
+		this.depth = depth;
 	}
 	
 	public Action getBestAction(ArrayList<Action> actions) { //returns null if no actions possible
@@ -23,16 +28,14 @@ public class Agent {
 		return best;
  	}
 	
-
-	
-	public Action getNextAction(State state, int depth) {
+	public Action getNextAction(State state) {
 		Action action = null;
 		switch(this.type) {
 		case 1:
 			action = random(state);
 			break;
 		case 2:
-			action = minimax(state, depth);
+			action = minimax(state, this.depth);
 			break;
 		case 3:
 			action = minimax_AB(state);

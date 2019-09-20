@@ -1,8 +1,0 @@
-To Fix
-
--Fix capture. Kinda works like chess now when agent is capturing
--change piece to capital when it gets to other end of board
--When user enters a move, first check it across all valid moves. Currently valid moves are possible
--Prompt user about the only valid move they can make and check their input to make sure it is
-as expected. Perhaps combine with above point
--

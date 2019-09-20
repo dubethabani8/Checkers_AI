@@ -61,8 +61,8 @@ public class Game {
 		
 		State currState = new State('b',board);
 		Game game = new Game(agent, currState, blackOrWhite.charAt(0));
-		if(game.userCol == 'b') game.currPlayer = 'b';
-		else game.currPlayer = 'w';
+
+		game.currPlayer = 'b';
 		
 		//START GAME PLAY
 		game.currState.board.print();

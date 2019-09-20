@@ -25,14 +25,14 @@ public class Agent {
 	
 
 	
-	public Action getNextAction(State state) {
+	public Action getNextAction(State state, int depth) {
 		Action action = null;
 		switch(this.type) {
 		case 1:
 			action = random(state);
 			break;
 		case 2:
-			action = minimax(state);
+			action = minimax(state, depth);
 			break;
 		case 3:
 			action = minimax_AB(state);
@@ -64,7 +64,7 @@ public class Agent {
 	}
 	
 	
-	public Action minimax(State state) {
+	public Action minimax(State state, int depth) {
 		return null;
 	}
 	

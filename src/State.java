@@ -66,6 +66,7 @@ public class State {
 		
 		//Clean actions to remain with only the ones that are possible in this state
 		this.actions = finalActions(this.actions);
+		if(this.actions.size() == 0) return null;
 		return this.actions;
 	}
 	

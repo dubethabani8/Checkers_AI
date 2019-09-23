@@ -47,18 +47,12 @@ public class Agent {
 	
 	public Action random(State state) {
 		ArrayList<Action> actions = state.getActions(); //Get all actions
-		System.out.println("Actions to chose from" + actions.toString());
+		Action best = new Action();
 		if(actions == null) return null;
-		Action best = this.getBestAction(actions);
-		System.out.println("Best action: " + best.toString());
-		if(best.val == 0) { //Chose random action	
+		else { //chose random action from the possible actions
 			Random rn = new Random();
 			int x = rn.nextInt(actions.size());
 			best = actions.get(x); //FIX HERR
-			System.out.println("Best val=0 so random choice: "+ best.toString());
-		}
-		else { //make only legal move
-			return best;
 		}
 		return best;
 	}

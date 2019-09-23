@@ -41,10 +41,29 @@ public class Action implements Comparable<Action> {
 		return contains;
 	}
 	
+	Boolean equals(String str) { //checks if a move like A1-B2-C3 is equal to A1-B2,B2-C3
+		ArrayList<String> temp = new ArrayList<String>();
+		Boolean equals = true;
+		for(int i=0; i <= str.length()-5; i += 3) {
+			String m = str.substring(i,i+5);
+			temp.add(m);
+		}
+		for(String s: temp) {
+			if(!this.moves.contains(s)) {
+				equals = false;
+			}
+		}
+		return equals;
+	}
+	
 
 	public static void main(String[] args) {
-
-
+		Action a = new Action();
+		ArrayList<String> moves = new ArrayList<String>();
+		moves.add("A1-B2");
+		moves.add("B2-C2");
+		a.moves = moves;
+		System.out.println(a.equals("A1-B2-C3"));;
 	}
 
 }

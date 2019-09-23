@@ -237,7 +237,8 @@ public class Board {
 		ArrayList<String> positions = new ArrayList<String>();
 		for(int i=0; i<board.size; i++)
 			for(int j=0; j<board.size; j++)
-				if(board.set_up[i][j] == player) positions.add(getSquareStr(i,j));
+				if(board.set_up[i][j] == player || board.set_up[i][j] == Character.toUpperCase(player))
+					positions.add(getSquareStr(i,j));
 		return positions;
 	}
 	

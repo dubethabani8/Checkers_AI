@@ -74,6 +74,7 @@ public class Game {
 				ArrayList<Action> actions = game.currState.getActions(); //Get all actions
 				if(actions == null) {
 					game.gameOver = true; //end game if no actions are available
+					System.out.println("\n\nGAME OVER!!!\n" +  "You lose");
 					break;
 				}
 				else {
@@ -95,34 +96,38 @@ public class Game {
 							continue;
 						}
 					}
-					else { //FIX THIS ELSE TO MAKE THE BEST MOVE. CHE
+					else { //Force player to perform best capture move
 						System.out.println("You can only make one of the following");
 						for(Action action: actions) {
-							System.out.println(action.moves.get(0));
+							System.out.println(action.moves.toString());
 						}
-						System.out.println("Your move: [src-dst]: ");
+						System.out.println("Your move: [src-step-step...-dst]: ");
 						String str = sc.next();
 						Boolean valid = false;
-						//check if valid action
 						for(Action action: actions) {
-							if(action.moves.get(0).equals(str)) {
+							if(action.equals(str)) {
 								valid = true;
+								game.currState.board.makeMove(action, game.currPlayer);
+								break;
 								//Action best = GET SELECTED SEQUENCE FROM ACTIONS
 							}
 						}
+						if(!valid) {
+							System.out.println("Invalid move!!!");
+							continue;
+						}
 						
-					} //Force player to perform best capture move
+					} 
 				}
 				
-				//game.currState.board.makeMove(move);
 
 			}
 			else { //AGENT PLAY
 				System.out.println("\nI'm thinking...");
-				System.out.println("Agent playing as " + game.currPlayer);
 				Action action = game.agent.getNextAction(game.currState);
 				if(action == null) {
 					game.gameOver = true;
+					System.out.println("\n\nGAME OVER!!!\n" +  "You win!!!");
 					break;
 				}
 				game.currState.board.makeMove(action, game.agentCol);
@@ -132,7 +137,7 @@ public class Game {
 			game.switchPlayer();
 		}
 		
-	}
+	} 
 	
 	
 	

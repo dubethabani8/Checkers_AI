@@ -8,4 +8,7 @@ as expected. Perhaps combine with above point
 -when comp played as b, returned a move to a square with its piece already. Perhaps dealing with older board set-up
 
 
--When user is forced to enter move, find way to allow entry of choice of equal moves***
+-When user is forced to enter move, find way to allow entry of choice of equal moves***-H1-B2-C3.. then parse that input
+
+-Not taking king positions
+-captures

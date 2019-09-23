@@ -32,11 +32,18 @@ public class Action implements Comparable<Action> {
 		return str;
 	}
 	
-	
+	Boolean contains(String move) {
+		Boolean contains = false;
+		for(String str: moves) {
+			if(this.moves.get(0).equals(move))
+				contains = true;
+		}
+		return contains;
+	}
 	
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+
 
 	}
 

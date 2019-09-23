@@ -7,14 +7,9 @@ public class Agent {
 	//1-random, 2-minimax, 3-minimax+alpha-beta pruning, 4-H-minimax+fixed depth cutoff+alpha-beta pruning
 	int type;
 	int depthLim;
-	int depth;
 	
 	public Agent(int type) {
 		this.type = type;
-	}
-	public Agent(int type, int depth) {
-		this.type = type;
-		this.depth = depth;
 	}
 	
 	public Action getBestAction(ArrayList<Action> actions) { //returns null if no actions possible
@@ -28,6 +23,8 @@ public class Agent {
 		return best;
  	}
 	
+
+	
 	public Action getNextAction(State state) {
 		Action action = null;
 		switch(this.type) {
@@ -35,7 +32,7 @@ public class Agent {
 			action = random(state);
 			break;
 		case 2:
-			action = minimax(state, this.depth);
+			action = minimax(state);
 			break;
 		case 3:
 			action = minimax_AB(state);
@@ -50,7 +47,7 @@ public class Agent {
 	
 	public Action random(State state) {
 		ArrayList<Action> actions = state.getActions(); //Get all actions
-		System.out.println("Actions to randomly chose from" + actions.toString());
+		System.out.println("Actions to chose from" + actions.toString());
 		if(actions == null) return null;
 		Action best = this.getBestAction(actions);
 		System.out.println("Best action: " + best.toString());
@@ -67,9 +64,13 @@ public class Agent {
 	}
 	
 	
-	public Action minimax(State state, int depth) {
+	public Action minimax(State state) {
+
+
 		return null;
 	}
+
+
 	
 	public Action minimax_AB(State state) {
 		return null;

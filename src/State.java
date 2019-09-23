@@ -37,9 +37,10 @@ public class State {
 					String poss = this.board.getSquareStr(i, j);
 					Boolean isKing = false;
 					if(squareVal == 'W' || squareVal == 'B') isKing = true;
-					ArrayList<String> myArr = this.board.positions(this.player);
-					ArrayList<String> oppoArr = this.board.positions(this.opponent);
+					ArrayList<String> myArr = this.board.positions(this.board,this.player);
+					ArrayList<String> oppoArr = this.board.positions(this.board, this.opponent);
 					moves = getPossActions(poss, isKing, myArr, oppoArr);
+
 					for(Action act: moves)
 						if(act.moves != null)
 							actions.add(act);
@@ -63,15 +64,13 @@ public class State {
 			this.board.flipActions(this.actions);
 		}
 		
+		//Clean actions to remain with only the ones that are possible in this state
+		this.actions = finalActions(this.actions);
 		return this.actions;
 	}
 	
 	public ArrayList<Action> getPossActions(String poss, Boolean isKing, ArrayList<String> myArr, ArrayList<String> oppoArr) { //get all possible moves for a piece
-		
-		ArrayList<Action> possMoves = possMoves(poss, isKing,myArr,oppoArr); 
-		for(Action act: possMoves) {
-			//System.out.println(act.moves.toString());
-		}
+		ArrayList<Action> possMoves = possMoves(poss, isKing,myArr,oppoArr);
 		//ArrayList<Action> possMoves = null;
 		return possMoves;
 	}
@@ -149,7 +148,7 @@ public class State {
 		//separate A1 to A & 1
 		row = currPos.charAt(0);
 		column = Character.getNumericValue((char)currPos.charAt(1));
-		
+	
 		//do {
 		
 			if(isKing == true) {  //checking if it's king
@@ -162,16 +161,16 @@ public class State {
 				
 				//checking boundaries v2
 				if(checkBound(rBefore,cBefore)) {
-					possibleDiag.add(currPos + "-" + Character.toString(rBefore) + Integer.toString(cBefore));
+					possibleDiag.add(Character.toString(rBefore) + Integer.toString(cBefore));
 				}
 				if(checkBound(rBefore,cAfter)) {
-					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cAfter));
+					possibleDiag.add(Character.toString(rBefore) + Integer.toString(cAfter));
 				}
 				if(checkBound(rAfter,cBefore)) {
-					possibleDiag.add(currPos + "-" +Character.toString(rAfter) + Integer.toString(cBefore));
+					possibleDiag.add(Character.toString(rAfter) + Integer.toString(cBefore));
 				}
 				if(checkBound(rAfter,cAfter)) {
-					possibleDiag.add(currPos + "-" +Character.toString(rAfter) + Integer.toString(cAfter));
+					possibleDiag.add(Character.toString(rAfter) + Integer.toString(cAfter));
 				}
 				
 				
@@ -184,24 +183,27 @@ public class State {
 				
 				//checking boundaries v2
 				if(checkBound(rBefore,cBefore)) {
-					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cBefore));
+					possibleDiag.add(Character.toString(rBefore) + Integer.toString(cBefore));
 				}
 				if(checkBound(rBefore,cAfter)) {
-					possibleDiag.add(currPos + "-" +Character.toString(rBefore) + Integer.toString(cAfter));
+					possibleDiag.add(Character.toString(rBefore) + Integer.toString(cAfter));
 				}
 							
 			}
 			
 			//for each diagonal position
 			for (String diag : possibleDiag) {
+		
 				char diagRow; //= diag.charAt(0);
 				int diagCol; //= Character.getNumericValue((char)currPos.charAt(1));
 				
 	
 				//check if there are my pieces
-				if( myArr.contains(diag) ) {
+				if(myArr.contains(diag) ) {
+					
 					//do not add to the actionList
 				}else if ( oppoArr.contains(diag) ) {
+					
 					//jump over opponent
 					//check empty position over the opponent and boundary
 					
@@ -223,7 +225,7 @@ public class State {
 							
 							//if it is within boundary and not in oppoArr and myArr then capture
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 	//							canMove = true;
 	//							jumpList.add(emptyPos);
@@ -245,7 +247,7 @@ public class State {
 							//if it is within boundary and not in oppoArr and myArr then add to output arr
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
 								canMove = true;
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 								
 							}else {
@@ -260,7 +262,7 @@ public class State {
 							//if it is within boundary and not in oppoArr and myArr then add to output arr
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
 								canMove = true;
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 								
 							}else {
@@ -275,7 +277,7 @@ public class State {
 							//if it is within boundary and not in oppoArr and myArr then add to output arr
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
 								canMove = true;
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 								
 								
@@ -293,7 +295,7 @@ public class State {
 							
 							//if it is within boundary and not in oppoArr and myArr then capture
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 	//							canMove = true;
 	//							jumpList.add(emptyPos);
@@ -315,7 +317,7 @@ public class State {
 							//if it is within boundary and not in oppoArr and myArr then add to output arr
 							if( checkBound(emptyRow, emptyCol) && !myArr.contains(emptyPos) && !oppoArr.contains(emptyPos)) {
 								canMove = true;
-								jumpList.add(emptyPos);
+								jumpList.add(currPos + "-" + emptyPos);
 								actionList.add(new Action(1,jumpList));
 								
 							}else {
@@ -335,7 +337,7 @@ public class State {
 				}else {
 					//empty position add to actionList with int val = 0
 					ArrayList<String> arr = new ArrayList<String>();
-					arr.add(diag);
+					arr.add(currPos + "-" + diag);
 					actionList.add( new Action(0, arr) );
 					//arr.removeAll(arr);
 				}
@@ -343,7 +345,6 @@ public class State {
 			
 		//}while(canMove);
 			
-		
 		return actionList; 
 	}
 	
@@ -362,13 +363,41 @@ public class State {
 	
 	
 	
+	public ArrayList<Action> finalActions(ArrayList<Action> actions){ //returns the actions of highest value only
+		int maxVal = 0;
+		ArrayList<Action> actionsN = new ArrayList<Action>();
+		for(Action action: actions) {
+			if(action.val > maxVal) maxVal = action.val;	
+		}
+		for(Action action: actions) {
+			if(action.val == maxVal) actionsN.add(action);
+		}
+		return actionsN;
+	}
+	
 	
 	
 	public static void main(String[] args) {
+	
 		Board b = new Board(1);
 		b.print();
 		State state = new State('b',b);
 		state.getActions();
+		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("dsgfcs");
+		Action a1 = new Action(0, list);
+		Action a2 = new Action(1, list);
+		Action a3 = new Action(1, list);
+		ArrayList<Action> actions = new ArrayList<Action>();
+		actions.add(a1);
+		actions.add(a2);
+		actions.add(a3);
+		System.out.println("Before ");
+		for(Action a: actions) System.out.println(a.toString());
+		actions = state.finalActions(actions);
+		System.out.println("After ");
+		for(Action a: actions) System.out.println(a.toString());
 		
 	}
 

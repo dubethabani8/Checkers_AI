@@ -44,13 +44,32 @@ public class Board {
 	
 	
 	
-	public void makeMove(Action action) {
+	public void makeMove(Action action, char player) {
 		for(String move:action.moves) {
-			if(move!= null) makeSingleMove(move);
+			if(move != null) makeSingleMove(move, player); //make single move
+			//Make piece changes to king and stop the series of moves
+			if(move.substring(3,4).equals("A") && player == 'w') {
+				int j = Integer.parseInt(move.substring(4,5))-1;
+				int i = getRow(move.charAt(3));
+				this.set_up[i][j] = 'W';
+				break;
+			}
+			else if(move.substring(3,4).equals("D") && player == 'b' && this.size == 4) {
+				int j = Integer.parseInt(move.substring(4,5))-1;
+				int i = getRow(move.charAt(3));
+				this.set_up[i][j] = 'B';
+				break;
+			}
+			else if(move.substring(3,4).equals("H") && player == 'b' && this.size == 8) {
+				int j = Integer.parseInt(move.substring(4,5))-1;
+				int i = getRow(move.charAt(3));
+				this.set_up[i][j] = 'B';
+				break;
+			}
 		}
 	}
 	
-	public void makeSingleMove(String move) { //takes in example 'D1-C2'
+	public void makeSingleMove(String move, char player) { //takes in example 'D1-C2'
 		int j1 = Integer.parseInt(move.substring(1,2))-1;
 		int j2 = Integer.parseInt(move.substring(4,5))-1;
 		int i1 = getRow(move.charAt(0));
@@ -68,6 +87,24 @@ public class Board {
 			this.set_up[i2][j2] = this.set_up[i1][j1];
 		}
 		this.set_up[i1][j1] = ' ';
+		
+		
+		//Make piece changes to king and stop the series of moves
+		if(move.substring(3,4).equals("A") && player == 'w') {
+			int j = Integer.parseInt(move.substring(4,5))-1;
+			int i = getRow(move.charAt(3));
+			this.set_up[i][j] = 'W';
+		}
+		else if(move.substring(3,4).equals("D") && player == 'b' && this.size == 4) {
+			int j = Integer.parseInt(move.substring(4,5))-1;
+			int i = getRow(move.charAt(3));
+			this.set_up[i][j] = 'B';
+		}
+		else if(move.substring(3,4).equals("H") && player == 'b' && this.size == 8) {
+			int j = Integer.parseInt(move.substring(4,5))-1;
+			int i = getRow(move.charAt(3));
+			this.set_up[i][j] = 'B';
+		}
 	}
 	
 	public String getSquareStr(int i, int j) { //returns the string identifier for a certain index
@@ -160,7 +197,7 @@ public class Board {
 		if(moves == null) return null;
 		else for(String str: moves) {
 			String _1 = str.substring(0, 2);
-			String _2 = str.substring(3, 5);
+			String _2 = str.substring(3);
 			_1 = flipPos(_1);
 			
 			_2 = flipPos(_2);
@@ -196,11 +233,11 @@ public class Board {
 		return nA;
 	}
 	
-	public ArrayList<String> positions(char player){ //Returns all positions occupied by player
+	public ArrayList<String> positions(Board board,char player){ //Returns all positions occupied by player
 		ArrayList<String> positions = new ArrayList<String>();
-		for(int i=0; i<this.size; i++)
-			for(int j=0; j<this.size; j++)
-				if(this.set_up[i][j] == player) positions.add(getSquareStr(i,j));
+		for(int i=0; i<board.size; i++)
+			for(int j=0; j<board.size; j++)
+				if(board.set_up[i][j] == player) positions.add(getSquareStr(i,j));
 		return positions;
 	}
 	
@@ -224,7 +261,7 @@ public class Board {
 		String x = "D1-B3";
 		b.set_up[2][1] = 'b';
 		b.print();
-		b.makeSingleMove(x);
+		b.makeSingleMove(x,'b');
 		b.print();
 	}
 

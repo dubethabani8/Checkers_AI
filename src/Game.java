@@ -25,9 +25,7 @@ public class Game {
 		else this.agentCol = 'b';
 	}
 	
-	
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) {	
 		//check how it is printing
 		Scanner sc = new Scanner(System.in);  // Create a Scanner object
 		System.out.println("Checkers by Thabani Dube, Arun Ramesh, Changhyun Lee");
@@ -37,7 +35,6 @@ public class Game {
 	    System.out.println("Standard 8x8 Checkers");
 	    System.out.print("Your Choice? ");
 	    int gameSize = sc.nextInt();
-	    
 	    Board board = new Board(gameSize);
 	    
 	    System.out.println("Choose your opponent:");
@@ -61,7 +58,6 @@ public class Game {
 		
 		State currState = new State('b',board);
 		Game game = new Game(agent, currState, blackOrWhite.charAt(0));
-
 		game.currPlayer = 'b';
 		
 		//START GAME PLAY
@@ -69,6 +65,7 @@ public class Game {
 		
 		while(!game.gameOver) {
 			game.currState.actions = new ArrayList<Action>();
+			
 			if(game.currPlayer == 'b') System.out.println("Next to move: BLACK");
 			else System.out.println("Next to move: WHITE");
 			
@@ -79,16 +76,46 @@ public class Game {
 					game.gameOver = true; //end game if no actions are available
 					break;
 				}
-				Action best = actions.get(0);
-				if(best.val == 0) {
-					System.out.println("Your move: [src-dst]: ");
-					String str = sc.next();
-					game.currState.board.makeSingleMove(str);
+				else {
+					Action best = actions.get(0);
+					if(best.val == 0) {
+						System.out.println("Your move: [src-dst]: ");
+						String str = sc.next();
+						Boolean valid = false;
+						//check if valid action
+						for(Action action: actions) {
+							if(action.contains(str))
+								valid = true;
+						}
+						if(valid) {
+							game.currState.board.makeSingleMove(str, game.currPlayer);
+						}
+						else{
+							System.out.println("Invalid move!!!");
+							continue;
+						}
+					}
+					else { //FIX THIS ELSE TO MAKE THE BEST MOVE. CHE
+						System.out.println("You can only make one of the following");
+						for(Action action: actions) {
+							System.out.println(action.moves.get(0));
+						}
+						System.out.println("Your move: [src-dst]: ");
+						String str = sc.next();
+						Boolean valid = false;
+						//check if valid action
+						for(Action action: actions) {
+							if(action.moves.get(0).equals(str)) {
+								valid = true;
+								//Action best = GET SELECTED SEQUENCE FROM ACTIONS
+							}
+						}
+						
+					} //Force player to perform best capture move
 				}
-				else {} //Force player to perform best capture move
 				
 				//game.currState.board.makeMove(move);
-				game.switchPlayer();
+
 			}
 			else { //AGENT PLAY
 				System.out.println("\nI'm thinking...");
@@ -98,10 +125,11 @@ public class Game {
 					game.gameOver = true;
 					break;
 				}
-				game.currState.board.makeMove(action);
-				game.switchPlayer();
+				game.currState.board.makeMove(action, game.agentCol);
+				
 			}
 			game.currState.board.print();
+			game.switchPlayer();
 		}
 		
 	}
@@ -112,10 +140,12 @@ public class Game {
 		if(this.currPlayer == 'w') {
 			this.currPlayer = 'b';
 			this.currState.player = 'b';
+			this.currState.opponent = 'w';
 		}
 		else{
 			this.currPlayer = 'w';
 			this.currState.player = 'w';
+			this.currState.opponent = 'b';
 			
 		}
 	}
